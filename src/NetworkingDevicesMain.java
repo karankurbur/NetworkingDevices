@@ -1,4 +1,8 @@
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
@@ -60,8 +64,8 @@ public class NetworkingDevicesMain {
 	 * Method determines the host machine's IPv4 and IPv6 addresses and subnet
 	 * information.
 	 * 
-	 * @return an array with the host machine's IPv4 and IPv6 addresses and
-	 *         subnet information.
+	 * @return an array with the host machine's IPv4 and IPv6 addresses and subnet
+	 *         information.
 	 * @throws UnknownHostException
 	 * @throws SocketException
 	 */
@@ -113,8 +117,7 @@ public class NetworkingDevicesMain {
 	/**
 	 * Helper method to determine IPv6 address.
 	 * 
-	 * @param addresses
-	 *            is all host addresses.
+	 * @param addresses is all host addresses.
 	 * @return - the IPv6 address.
 	 */
 	public static Inet6Address getIPv6Addresses(InetAddress[] addresses) {
@@ -146,5 +149,63 @@ public class NetworkingDevicesMain {
 		}
 
 		return 0;
+	}
+
+	/**
+	 * 
+	 * @param String containing ipAddress
+	 * @throws IOException Broadcasts host's accessibility
+	 */
+	public static void ping(String ipString) throws IOException {
+		try {
+
+			InetAddress ip = InetAddress.getByName(ipString);
+			if (ip.isReachable(6000)) {
+				System.out.println(ipString + " was successfully pinged");
+			} else {
+				System.err.println("Request timeout");
+			}
+		} catch (UnknownHostException e) {
+			System.err.println("Unknown host. Please check if the IP address is correct. ");
+		}
+
+	}
+
+	// based on
+	// https://plateofcode.blogspot.com/2016/04/how-trace-root-server-ip-in-java.html
+	public static String traceRoute(String a) throws UnknownHostException {
+		InetAddress address = InetAddress.getByName(a);
+		final String os = System.getProperty("os.name").toLowerCase();
+		String route = "";
+		try {
+			Process traceRt;
+			if (os.contains("win"))
+				traceRt = Runtime.getRuntime().exec("tracert " + address.getHostAddress());
+			else
+				traceRt = Runtime.getRuntime().exec("traceroute " + address.getHostAddress());
+
+			route = convertStreamToString(traceRt.getInputStream());
+
+			// String errors = convertStreamToString(traceRt.getErrorStream());
+
+		} catch (IOException e) {
+
+		}
+
+		return route;
+	}
+
+	private static String convertStreamToString(InputStream inputStream) {
+		BufferedReader bf = new BufferedReader(new InputStreamReader(inputStream));
+		String line = "";
+		try {
+			while ((line = bf.readLine()) != null) {
+				System.out.println(line);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
