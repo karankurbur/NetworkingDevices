@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 
 /*
@@ -27,7 +28,7 @@ diagnostic tools on the network.
 */
 
 /**
- * Runs the applicaation.
+ * Runs the application.
  *
  * @author Raisa Meneses
  * @author Denis Yakovlev
@@ -44,64 +45,72 @@ public class NetworkingDevicesMain {
 	 */
 	public static void main(String[] args) throws Exception  {
 		
-		// local host name
-		InetAddress localHost = InetAddress.getLocalHost();
-		String localHostName = localHost.getHostName();
-		System.out.println(localHostName);
-		
-		// ****************************************************
-		System.out.println("");
-		// ****************************************************
-		
-		// local host address
-		System.out.println(localHost.getHostAddress());
-		
-		// ****************************************************
-		System.out.println("");
-		// ****************************************************
-		
-		// all addresses by local host name
-		InetAddress[] addressesArray = InetAddress.getAllByName(localHostName);
-		for (int i = 0; i < addressesArray.length; i++) {
-			System.out.println(Arrays.toString(addressesArray[i].getAddress()));
-		}
-		
-		// ****************************************************
-		System.out.println("");		
-		// ****************************************************
-		
-		// from: https://www.geeksforgeeks.org/java-program-find-ip-address-computer/
-		
-		// Find public IP address
-        String systemipaddress = "";
-        try
-        {
-            URL url_name = new URL("http://bot.whatismyipaddress.com");
- 
-            BufferedReader sc =
-            new BufferedReader(new InputStreamReader(url_name.openStream()));
- 
-            // reads system IPAddress
-            systemipaddress = sc.readLine().trim();
-        }
-        catch (Exception e)
-        {
-            systemipaddress = "Cannot Execute Properly";
-        }
-        System.out.println("Public IP Address: " + systemipaddress +"\n");
+		part1();
 		
 		
-		
-		// ****************************************************
-		System.out.println("");
-		// ****************************************************
-		
-		byte[] ipAddr = new byte[] { 127, 0, 0, 1 };
-	    InetAddress addr = InetAddress.getByAddress(ipAddr);
-	    System.out.print("test: ");
-	    System.out.println(Arrays.toString(addr.getAddress()));
-		// ****************************************************
 		
 	}	
+	
+	public static void part1() throws UnknownHostException {
+		
+		// local host name
+				InetAddress localHost = InetAddress.getLocalHost();
+				String localHostName = localHost.getHostName();
+				System.out.println(localHostName);
+				
+				// ****************************************************
+				System.out.println("");
+				// ****************************************************
+				
+				// local host address
+				System.out.println(localHost.getHostAddress());
+				
+				// ****************************************************
+				System.out.println("");
+				// ****************************************************
+				
+				// all addresses by local host name
+				InetAddress[] addressesArray = InetAddress.getAllByName(localHostName);
+				for (int i = 0; i < addressesArray.length; i++) {
+					System.out.println(Arrays.toString(addressesArray[i].getAddress()));
+				}
+				
+				// ****************************************************
+				System.out.println("");		
+				// ****************************************************
+				
+				// from: https://www.geeksforgeeks.org/java-program-find-ip-address-computer/
+				
+				// Find public IP address
+		        String systemipaddress = "";
+		        try
+		        {
+		            URL url_name = new URL("http://bot.whatismyipaddress.com");
+		 
+		            BufferedReader sc =
+		            new BufferedReader(new InputStreamReader(url_name.openStream()));
+		 
+		            // reads system IPAddress
+		            systemipaddress = sc.readLine().trim();
+		        }
+		        catch (Exception e)
+		        {
+		            systemipaddress = "Cannot Execute Properly";
+		        }
+		        System.out.println("Public IP Address: " + systemipaddress +"\n");
+				
+				
+				
+				// ****************************************************
+				System.out.println("");
+				// ****************************************************
+				
+				byte[] ipAddr = new byte[] { 127, 0, 0, 1 };
+			    InetAddress addr = InetAddress.getByAddress(ipAddr);
+			    System.out.print("test: ");
+			    System.out.println(Arrays.toString(addr.getAddress()));
+				// ****************************************************
+		
+	}
 	
 }
