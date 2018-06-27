@@ -1,10 +1,10 @@
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.URL;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 
 /*
  NetworkingDevicesMain.java
@@ -28,7 +28,8 @@ diagnostic tools on the network.
 */
 
 /**
- * Runs the application.
+ * An application that queries the operating system and runs several diagnostic
+ * tools on the network.
  *
  * @author Raisa Meneses
  * @author Denis Yakovlev
@@ -37,80 +38,113 @@ diagnostic tools on the network.
  * @version 30 June 2017
  */
 public class NetworkingDevicesMain {
-	
+
 	/**
 	 * Driver method.
 	 * 
-	 * @param args command line args.
+	 * @param args
+	 *            is command line args.
 	 */
-	public static void main(String[] args) throws Exception  {
-		
-		part1();
-		
-		
-		
-	}	
-	
-	public static void part1() throws UnknownHostException {
-		
-		// local host name
-				InetAddress localHost = InetAddress.getLocalHost();
-				String localHostName = localHost.getHostName();
-				System.out.println(localHostName);
-				
-				// ****************************************************
-				System.out.println("");
-				// ****************************************************
-				
-				// local host address
-				System.out.println(localHost.getHostAddress());
-				
-				// ****************************************************
-				System.out.println("");
-				// ****************************************************
-				
-				// all addresses by local host name
-				InetAddress[] addressesArray = InetAddress.getAllByName(localHostName);
-				for (int i = 0; i < addressesArray.length; i++) {
-					System.out.println(Arrays.toString(addressesArray[i].getAddress()));
-				}
-				
-				// ****************************************************
-				System.out.println("");		
-				// ****************************************************
-				
-				// from: https://www.geeksforgeeks.org/java-program-find-ip-address-computer/
-				
-				// Find public IP address
-		        String systemipaddress = "";
-		        try
-		        {
-		            URL url_name = new URL("http://bot.whatismyipaddress.com");
-		 
-		            BufferedReader sc =
-		            new BufferedReader(new InputStreamReader(url_name.openStream()));
-		 
-		            // reads system IPAddress
-		            systemipaddress = sc.readLine().trim();
-		        }
-		        catch (Exception e)
-		        {
-		            systemipaddress = "Cannot Execute Properly";
-		        }
-		        System.out.println("Public IP Address: " + systemipaddress +"\n");
-				
-				
-				
-				// ****************************************************
-				System.out.println("");
-				// ****************************************************
-				
-				byte[] ipAddr = new byte[] { 127, 0, 0, 1 };
-			    InetAddress addr = InetAddress.getByAddress(ipAddr);
-			    System.out.print("test: ");
-			    System.out.println(Arrays.toString(addr.getAddress()));
-				// ****************************************************
-		
+	public static void main(String[] args) throws Exception {
+
+		// host machine's IPv4 and IPv6 addresses and subnet information
+		String[] part1Data = part1();
+		// check host machine's IPv4 and IPv6 addresses and subnet information
+		for (int i = 0; i < part1Data.length; i++) {
+			System.out.println(part1Data[i]);
+		}
+
 	}
-	
+
+	/**
+	 * Method determines the host machine's IPv4 and IPv6 addresses and subnet
+	 * information.
+	 * 
+	 * @return an array with the host machine's IPv4 and IPv6 addresses and
+	 *         subnet information.
+	 * @throws UnknownHostException
+	 * @throws SocketException
+	 */
+	public static String[] part1() throws UnknownHostException, SocketException {
+
+		// resulting array with the host machine's IPv4 and IPv6 addresses and
+		// subnet information.
+		String arrayIPv4_Ipv6_SubnetMask[] = new String[3];
+		String iPv4 = "";
+		String iPv6 = "";
+		String subnetMaskInString = "";
+
+		// determines local host and its name
+		InetAddress localHost = InetAddress.getLocalHost();
+		String localHostName = localHost.getHostName();
+
+		// determines IPv4 address
+		iPv4 = localHost.getHostAddress();
+
+		// determines all addresses by local host name
+		InetAddress[] addressesArray = InetAddress.getAllByName(localHostName);
+		// determines IPv6 address
+		Inet6Address iPv6Address = getIPv6Addresses(addressesArray);
+		iPv6 = iPv6Address.getHostAddress();
+
+		// determines the subnet mask
+		short subnetMask = getSubnetMask(localHost);
+		subnetMaskInString = "" + subnetMask;
+
+		// filled out the resulting array
+		if (iPv4 != null) {
+			arrayIPv4_Ipv6_SubnetMask[0] = iPv4;
+		} else {
+			arrayIPv4_Ipv6_SubnetMask[0] = "cannot define IPv4 address";
+		}
+
+		if (iPv6 != null) {
+			arrayIPv4_Ipv6_SubnetMask[1] = iPv6;
+		} else {
+			arrayIPv4_Ipv6_SubnetMask[1] = "cannot define IPv6 address";
+		}
+
+		arrayIPv4_Ipv6_SubnetMask[2] = subnetMaskInString;
+
+		return arrayIPv4_Ipv6_SubnetMask;
+
+	}
+
+	/**
+	 * Helper method to determine IPv6 address.
+	 * 
+	 * @param addresses
+	 *            is all host addresses.
+	 * @return - the IPv6 address.
+	 */
+	public static Inet6Address getIPv6Addresses(InetAddress[] addresses) {
+
+		for (InetAddress address : addresses) {
+			if (address instanceof Inet6Address) {
+				return (Inet6Address) address;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Helper method to determines subnet mask.
+	 * 
+	 * @param localHost
+	 *            is the local host.
+	 * @return a number of the highest ones in subnet mask.
+	 * @throws SocketException
+	 */
+	public static short getSubnetMask(InetAddress localHost) throws SocketException {
+
+		NetworkInterface networkInterface = NetworkInterface.getByInetAddress(localHost);
+		for (InterfaceAddress address : networkInterface.getInterfaceAddresses()) {
+			if (address instanceof InterfaceAddress) {
+				return address.getNetworkPrefixLength();
+			}
+		}
+
+		return 0;
+	}
 }
