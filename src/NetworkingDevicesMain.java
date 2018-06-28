@@ -9,6 +9,7 @@ import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
 /*
  NetworkingDevicesMain.java
@@ -43,21 +44,83 @@ diagnostic tools on the network.
  */
 public class NetworkingDevicesMain {
 
+	static String FQDN = "";
+	static String ip = "";
+
 	/**
 	 * Driver method.
 	 * 
-	 * @param args
-	 *            is command line args.
+	 * @param args is command line args.
 	 */
 	public static void main(String[] args) throws Exception {
 
-		// host machine's IPv4 and IPv6 addresses and subnet information
-		String[] part1Data = part1();
-		// check host machine's IPv4 and IPv6 addresses and subnet information
-		for (int i = 0; i < part1Data.length; i++) {
-			System.out.println(part1Data[i]);
-		}
+		part2();
 
+		// queryIP("www.ipv6tf.org");
+		// // host machine's IPv4 and IPv6 addresses and subnet information
+//		String[] part1Data = part1();
+//		// check host machine's IPv4 and IPv6 addresses and subnet information
+//		for (int i = 0; i < part1Data.length; i++) {
+//			System.out.println(part1Data[i]);
+//		}
+	}
+
+	public static void part2() {
+		System.out.println("Enter 1 for FQDN, 2 for IPv4, 3 for IPv6");
+		Scanner scanner = new Scanner(System.in);
+		int i = Integer.parseInt(scanner.nextLine());
+		if (i == 1) {
+			System.out.println("Enter FQDN:");
+			String FQDN = scanner.nextLine();
+			queryIP(FQDN);
+		} else if (i == 2) {
+			System.out.println("Enter IPv4:");
+			String ip = scanner.nextLine();
+			findFQDNIPv4(ip);
+		} else if (i == 3) {
+			System.out.println("Enter IPv6:");
+			String ip = scanner.nextLine();
+			findFQDNIPv6(ip);
+		}
+	}
+
+	public static void queryIP(String FQDN) {
+		try {
+			InetAddress address = InetAddress.getByName(FQDN);
+			String output = address.toString();
+			String parse[] = output.split("/");
+			System.out.println("Your IP is " + parse[1]);
+			ip = parse[1];
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void findFQDNIPv4(String ip) {
+		InetAddress ia;
+		try {
+			ia = InetAddress.getByName(ip);
+			System.out.println("FQDN for this IP is : " + ia.getCanonicalHostName());
+			FQDN = ia.getCanonicalHostName().toString();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	// Doesnt work
+	public static void findFQDNIPv6(String ip) {
+//		InetAddress ia;
+//		try {
+//			ia = InetAddress.getByName(ip);
+//			System.out.println("FQDN for this IP is : " + ia.getCanonicalHostName());
+//			System.out.println("FQDN for this IP is : " + ia.getHostName());
+//
+//			FQDN = ia.getCanonicalHostName().toString();
+//		} catch (UnknownHostException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	/**
@@ -111,7 +174,6 @@ public class NetworkingDevicesMain {
 		arrayIPv4_Ipv6_SubnetMask[2] = subnetMaskInString;
 
 		return arrayIPv4_Ipv6_SubnetMask;
-
 	}
 
 	/**
@@ -134,8 +196,7 @@ public class NetworkingDevicesMain {
 	/**
 	 * Helper method to determines subnet mask.
 	 * 
-	 * @param localHost
-	 *            is the local host.
+	 * @param localHost is the local host.
 	 * @return a number of the highest ones in subnet mask.
 	 * @throws SocketException
 	 */
